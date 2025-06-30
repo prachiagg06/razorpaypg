@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<body>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<link rel="stylesheet" href="style.css">
+   
+  <div class="heading-box">
+    <img src="https://media.istockphoto.com/id/1209951015/photo/young-woman-wearing-raincoat.jpg?b=1&s=612x612&w=0&k=20&c=q_NV8GI0H-oJXIaJ81jMbMjZDz2yYbXZGI9wbUzeDi0=" alt="Icon">
+    WINTER COLLECTION
+  </div>
+    <h3> CLICK PAY BUTTON TO PURCHASE</h3>
+     <div class="container">
+    <div class="image-box">
+      <img src="https://i.pinimg.com/236x/57/ba/ca/57baca0b60bc6069abac1926c22659d3.jpg" alt="Image 1">
+    </div>
+  </div>
+  <button id="pay-btn">Pay ₹500</button>
+  <br>
+  <script src="https://checkout.razorpay.com/v1/razorpay.js"></script>
+  <script>
+    document.getElementById('pay-btn').onclick = async () => {
+      const res = await fetch('https://razorpay-backend.onrender.com/create-order', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ amount: 500 })
+      });
+      const order = await res.json();
+
+      const rzp = new Razorpay({
+        key: 'rzp_test_j3dYWKRUu4qxU8',
+        amount: order.amount,
+        currency: order.currency,
+        order_id: order.id,
+        handler: async resp => {
+          const verify = await fetch('https://razorpay-backend.onrender.com/create-order', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(resp)
+          });
+          const result = await verify.json();
+          alert(result.status === 'success' ? 'Payment OK' : 'Verification Failed');
+        },
+        theme: { color: '#3399cc' }
+      });
+      rzp.open();
+    };
+  </script>
+</body>
+</html>
